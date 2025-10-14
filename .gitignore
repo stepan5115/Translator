@@ -37,6 +37,9 @@ build/
 ### Mac OS ###
 .DS_Store
 
+### Docker ###
+.docker/
+
 ### My files ###
 Solution.java
 Sort.java
