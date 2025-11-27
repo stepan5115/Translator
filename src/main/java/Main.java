@@ -22,7 +22,6 @@ public class Main {
 
         } catch (Exception ex) {
             System.out.println("Error processing file '" + filename + "': " + ex.getMessage());
-            ex.printStackTrace();
         }
     }
 
