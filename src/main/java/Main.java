@@ -42,7 +42,9 @@ public class Main {
                 "int f(void x) { return x; }",
                 "int f(int a) { return b; }",
                 "void main() { add(5, 3) }",
-                "void f() { return 5; }"
+                "void f() { return 5; }",
+                "int f(int x) { return 10; } f(x" +
+                        ");"
         };
 
         for (int i = 0; i < tests.length; i++) {

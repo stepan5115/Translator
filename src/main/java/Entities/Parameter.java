@@ -1,7 +1,6 @@
 package Entities;
 
-import Utils.Scanner;
-
+//класс для представления параметров функции
 public class Parameter {
     private final Type type;
     private final String name;

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+//класс, представляющий функцию
 public class Function {
     private Type type;
     private String name;
@@ -17,6 +18,7 @@ public class Function {
         this.name = name;
         this.parameters = parameters != null ? parameters : List.of();
         this.instructions = instructions != null ? instructions : List.of();
+        //сверяем совпадение типа значения, возвращаемого return и типа функции
         if (returnInstruction == null) {
             if (type == Type.VOID)
                 this.returnInstruction = null;
@@ -52,10 +54,13 @@ public class Function {
         return returnInstruction;
     }
 
+    //проверка контекста функции
     public void checkRightContext(List<Function> functions) {
+        //создаем контекст переменных, заполняя его параметрами функции
         Map<String, Type> localContext = new HashMap<>();
         for (Parameter parameter : parameters)
             localContext.put(parameter.getName(), parameter.getType());
+        //проверяем инструкции на соответствии контексту
         for (Instruction instr : instructions) {
             if (instr instanceof FunctionCallInstruction exprInstr) {
                 resolveExpressionType(exprInstr.getCall(), functions, localContext);
@@ -63,7 +68,8 @@ public class Function {
             else
                 throw new RuntimeException("Неизвестная инструкция: " + instr);
         }
-
+        //проверяем return на соответствие контексту
+        //и снова на всякий случай проверяем соответствие типа return и функции
         if (returnInstruction != null) {
             Type retType = resolveExpressionType(returnInstruction, functions, localContext);
             if (retType != this.type)
@@ -73,13 +79,15 @@ public class Function {
             throw new RuntimeException("Ошибка: функция '" + name + "' должна возвращать значение типа " + this.type);
         }
     }
+    //сверяет соответствие контексту выражения и возвращает его тип
     public Type resolveExpressionType(Expression expr, List<Function> functions, Map<String, Type> localContext) {
         if (expr == null) return Type.VOID;
 
+        //просто число
         if (expr instanceof NumberExpression) {
             return Type.INTEGER;
         }
-
+        //обращение к переменной
         if (expr instanceof VariableExpression var) {
             String name = var.getName();
             if (!localContext.containsKey(name)) {
@@ -90,20 +98,21 @@ public class Function {
             }
             return localContext.get(name);
         }
-
+        //вызов функции
         if (expr instanceof ExpressionFunctionCall call) {
+            //поиск функции по имени в контексте
             String funcName = call.getFunctionName();
             Function f = functions.stream()
                     .filter(fn -> fn.getName().equals(funcName))
                     .findFirst()
                     .orElseThrow(() -> new RuntimeException("Ошибка: вызов неизвестной функции '" + funcName + "'"));
-
+            //сверка количества аргументов и параметров
             List<Expression> args = call.getArguments();
             List<Parameter> params = f.getParameters();
             if (args.size() != params.size())
                 throw new RuntimeException("Ошибка при вызове функции '" + funcName + "': ожидалось "
                         + params.size() + " аргументов, передано " + args.size());
-
+            //сверка типов аргументов и типов параметров
             for (int i = 0; i < args.size(); i++) {
                 Type argType = resolveExpressionType(args.get(i), functions, localContext);
                 Type paramType = params.get(i).getType();
@@ -113,8 +122,9 @@ public class Function {
             }
             return f.getType();
         }
-
+        //композиция выражений
         if (expr instanceof BinaryExpression bin) {
+            //проверка совпадения типов двух частей (и их равенство типу int)
             Type left = resolveExpressionType(bin.getLeft(), functions, localContext);
             Type right = resolveExpressionType(bin.getRight(), functions, localContext);
             if (bin.getLeft().type != bin.getRight().type)
