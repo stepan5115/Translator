@@ -30,4 +30,26 @@ public class VariableExpression extends Expression {
             }
         throw new RuntimeException("Неизвестная переменная: " + name);
     }
+
+    @Override
+    public String toString() {
+        return name + "-" + type;
+    }
+
+    //переопределяем тип выражения для функции (есть вероятность, что неверный)
+
+    @Override
+    public void correctionOfTypes(Map<Parameter, Object> globalContext, List<Function> functions, Function main) {
+        Parameter var = null;
+        for (Parameter parameter : globalContext.keySet())
+            if (parameter.getName().equals(name)) {
+                var = parameter;
+                break;
+            }
+        if (var == null) {
+            throw new RuntimeException("Переменная " + name +
+                    " не найдена в заданном контексте для выполнения функции " + main.getName());
+        }
+        this.type = var.getType();
+    }
 }

@@ -40,4 +40,27 @@ public class BinaryExpression extends Expression {
     public Expression getLeft() { return left; }
     public Expression getRight() { return right; }
     public char getOperator() { return operator; }
+
+    @Override
+    public String toString() {
+        return "..." + operator + "..." + "-" + type;
+    }
+
+    @Override
+    public void correctionOfTypes(Map<Parameter, Object> globalContext, List<Function> functions, Function main) {
+        if (left != null)
+            left.correctionOfTypes(globalContext, functions, main);
+        else
+            throw new RuntimeException("В выражении с оператором левая часть пустая!");
+        if (right != null)
+            right.correctionOfTypes(globalContext, functions, main);
+        else
+            throw new RuntimeException("В выражении с оператором правая часть пустая!");
+        if (right.getType() != left.getType())
+            throw new RuntimeException("Выявлено несовпадение типов в сложном выражении: " +
+                    left.getType() + operator + right.getType());
+        if (right.getType() != Type.INTEGER)
+            throw new RuntimeException("Выявлено несовпадение типов в сложном выражении: можно " +
+                    "производить операции \"" + operator + "\" только над выражениями типа INTEGER");
+    }
 }

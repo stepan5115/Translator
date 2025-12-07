@@ -15,4 +15,9 @@ public class NumberExpression extends Expression {
     public Object evaluate(List<Function> functions, Map<Parameter, Object> parameters) {
         return value;
     }
+
+    @Override
+    public String toString() {
+        return value + "-" + type;
+    }
 }

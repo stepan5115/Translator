@@ -23,7 +23,7 @@ public class Translator {
     private final List<Instruction> globalInstructions = new LinkedList<>();
 
     //----------------- Существующие функции --------------------/
-    private final List<Function> existingFunctions = List.of(
+    private static final List<Function> existingFunctions = List.of(
             new Function(
                     Type.VOID,
                     "print",
@@ -151,8 +151,12 @@ public class Translator {
         //пока не встретим закрывающую скобку - считываем инструкции
         //даже при встрече null, несмотря на то, что ошибка тут не вылетит,
         //она вылетит для обработчика объявления функции при вызове expect для закрывающей скобки
+        boolean alreadyReturn = false;
         while (currentToken != null && !(currentToken.getType() == TOKEN_TYPE.SEPARATORS && currentToken.asChar() == '}')) {
-            if (currentToken.getType() == TOKEN_TYPE.KEY_WORD && currentToken.asString().equals("return")) {
+            if (alreadyReturn)
+                throw new RuntimeException("после инструкции return не может быть других инструкций!");
+            else if (currentToken.getType() == TOKEN_TYPE.KEY_WORD && currentToken.asString().equals("return")) {
+                alreadyReturn = true;
                 returnInstruction();
             } else {
                 instruction();

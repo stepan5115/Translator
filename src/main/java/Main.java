@@ -27,7 +27,7 @@ public class Main {
 
     private static void runDefaultTests() {
         String[] tests = {
-                """
+            """
             int add(int a, int b) { return a + b; }
             int sub(int x, int y) { return x - y; }
             void main() {
@@ -43,7 +43,19 @@ public class Main {
                 "void main() { add(5, 3) }",
                 "void f() { return 5; }",
                 "int f(int x) { return 10; } f(x" +
-                        ");"
+                        ");",
+            """
+            int main(int a)
+            {
+                return a;
+                return a + 1;
+            }
+            print(main(1));
+            """,
+            """
+            print(t());
+            void t() {}
+            """
         };
 
         for (int i = 0; i < tests.length; i++) {
